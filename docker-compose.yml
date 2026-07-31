@@ -1,5 +1,27 @@
+services:
+  # ----------------------------------------------------
+  # ตัวที่ 1: ฐานข้อมูล (Database)
+  # ----------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: 69-s3-db
+    ports:
+      - "54327:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=narasuep.s
+      - POSTGRES_DB=narasuep.s
 
-
-
-
-    
+  # ----------------------------------------------------
+  # ตัวที่ 2: ระบบจัดการฐานข้อมูล (Admin UI)
+  # ----------------------------------------------------
+  admin:
+    image: dpage/pgadmin4
+    container_name: 69-s3-pgadmin
+    ports:
+      - "8084:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=narasuep-s@rmutp.ac.th
+      - PGADMIN_DEFAULT_PASSWORD=password
+    depends_on:
+      - db
