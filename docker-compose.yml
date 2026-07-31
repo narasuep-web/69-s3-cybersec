@@ -1,13 +1,13 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: 69-s3-db-admin
+    container_name: 69-s3-db
     ports:
       - "54327:5432"
     environment:
       - POSTGRES_PASSWORD=password
-      - POSTGRES_USER=sarunyu.d
-      - POSTGRES_DB=sarunyu.d
+      - POSTGRES_USER=narasuep.s
+      - POSTGRES_DB=narasuep.s
     # ตรงนี้แหละครับที่อาจารย์ต้องการ (Map Volume กันข้อมูลหาย)
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -18,7 +18,7 @@ services:
     ports:
       - "8084:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=sarunyu.d@rmutp.ac.th
+      - PGADMIN_DEFAULT_EMAIL=narasuep-s@rmutp.ac.th
       - PGADMIN_DEFAULT_PASSWORD=password
     depends_on:
       - db
