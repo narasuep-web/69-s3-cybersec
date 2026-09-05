@@ -1,44 +1,56 @@
 # REST
 
 ### Login
-POST http://localhost:9093/admin/login
+POST   http://localhost:8083/admin/login
 Content-Type: application/json
 
 {
-    "email": "",
-    "password": "",
-    "rememberMe":
+    "email": "narasuep-s@rmutp.ac.th",
+    "password": "TempPass#2026!",
+    "rememberMe": true
 }
 
 ### Login (User)
-POST http://localhost:9093/api/auth/local
+POST http://localhost:8083/api/auth/local
 Content-Type: application/json
 
 {
-    "identifier": "",
-    "password": ""
+    "identifier": "narasuep-s@rmutp.ac.th",
+    "password": "TempPass#2026!"
 }
 
 ### Signup
-POST http://localhost:9093/admin/register-admin
+POST   http://localhost:8083/api/auth/local/register
 Content-Type: application/json
 
 {
-    "firstname": "",
-    "lastname": "",
-    "email": "",
-    "password": ""
+    "username": "narasuep-s1",
+    "email": "narasuep-s@rmutp.ac.th",
+    "password": "TempPass#2026!"
 }
 
-### Forgot Password
-POST http://localhost:9093/admin/forgot-password
+### Forgot Password (Admin)
+POST http://localhost:8083/admin/forgot-password
 Content-Type: application/json
 
 {
-    "email": ""
+    "email": "narasuep-s@rmutp.ac.th",
 }
+
+### Forgot Password (User)
+POST http://localhost:8083/api/auth/forgot-password
+Content-Type: application/json
+
+{
+    "email": "narasuep-s@rmutp.ac.th"
+}
+
 
 ### Profile
-GET http://localhost:9093/admin/users/me
+GET http://localhost:8083/admin/users/me
 
-Authorization: Bearer <Token>
+Content-Type: application/json
+
+{
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxIiwic2Vzc2lvbklkIjoiODFjYTU1Mzc5ODM1NDIxNjVmYzMwOWQyOWQyOTU1YmEiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzg4NjE4NjUxLCJleHAiOjE3ODg2MjA0NTF9.Sy0VIMIwEAs9tqQzIhCfEi5ulpij7vqnjv9ny-ntXLg"
+}
