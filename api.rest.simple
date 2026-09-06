@@ -1,56 +1,114 @@
 # REST
 
-### Login
-POST   http://localhost:8083/admin/login
+### Variables
+@baseUrl = http://localhost:8083
+
+# Admin Variables
+@adminEmail = narasuep-s@rmutp.ac.th
+@adminPassword = TempPass#2026!
+@adminNewPassword = TempPass#2026!
+@adminResetToken = 
+
+# User Variables
+@userEmail = narasuep-s@rmutp.ac.th
+@userPassword = TempPass#2026!
+@userNewPassword = TempPass#2026!
+@userResetCode = 
+
+# @baseUrl = {{$dotenv BASE_URL}}
+# @adminEmail = {{$dotenv ADMIN_EMAIL}}
+# @adminPassword = {{$dotenv ADMIN_PASSWORD}}
+
+## 1. Admin Section
+
+### 1.1 Login (Admin)
+# @name adminLogin
+POST {{baseUrl}}/admin/login
 Content-Type: application/json
 
 {
-    "email": "narasuep-s@rmutp.ac.th",
-    "password": "TempPass#2026!",
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}",
     "rememberMe": true
 }
 
-### Login (User)
-POST http://localhost:8083/api/auth/local
+### 1.2 Signup
+POST {{baseUrl}}/admin/register
 Content-Type: application/json
 
 {
-    "identifier": "narasuep-s@rmutp.ac.th",
-    "password": "TempPass#2026!"
+    "username": "admin",
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}"
 }
 
-### Signup
-POST   http://localhost:8083/api/auth/local/register
+### 1.3 Forgot Password
+POST {{baseUrl}}/admin/forgot-password
 Content-Type: application/json
 
 {
-    "username": "narasuep-s1",
-    "email": "narasuep-s@rmutp.ac.th",
-    "password": "TempPass#2026!"
+    "email": "{{adminEmail}}"
 }
 
-### Forgot Password (Admin)
-POST http://localhost:8083/admin/forgot-password
+### 1.4 Reset Password
+# หมายเหตุ: สำหรับ Strapi Admin API endpoint นี้ใช้ key "resetPasswordToken" และ "password"
+POST {{baseUrl}}/admin/reset-password
 Content-Type: application/json
 
 {
-    "email": "narasuep-s@rmutp.ac.th",
+    "resetPasswordToken": "{{adminResetToken}}",
+    "password": "{{adminNewPassword}}"
 }
 
-### Forgot Password (User)
-POST http://localhost:8083/api/auth/forgot-password
+### 1.5 Profile
+# ดึง token อัตโนมัติจากผลลัพธ์ของ adminLogin (หรือใส่ Token ใน Bearer ได้โดยตรง)
+@adminToken = {{adminLogin.response.body.data.token}}
+GET {{baseUrl}}/admin/users/me
+Authorization: Bearer {{adminToken}}
+
+
+## 2. User Section
+
+### 2.1 Login (User)
+# @name userLogin
+POST {{baseUrl}}/api/auth/local
 Content-Type: application/json
 
 {
-    "email": "narasuep-s@rmutp.ac.th"
+    "identifier": "{{userEmail}}",
+    "password": "{{userPassword}}"
 }
 
-
-### Profile
-GET http://localhost:8083/admin/users/me
-
+### 2.2 Signup
+POST {{baseUrl}}/api/auth/local/register
 Content-Type: application/json
 
 {
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxIiwic2Vzc2lvbklkIjoiODFjYTU1Mzc5ODM1NDIxNjVmYzMwOWQyOWQyOTU1YmEiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzg4NjE4NjUxLCJleHAiOjE3ODg2MjA0NTF9.Sy0VIMIwEAs9tqQzIhCfEi5ulpij7vqnjv9ny-ntXLg"
+    "username": "narasuep-s",
+    "email": "{{userEmail}}",
+    "password": "{{userPassword}}"
 }
+
+### 2.3 Forgot Password
+POST {{baseUrl}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+    "email": "{{userEmail}}"
+}
+
+### 2.4 Reset Password
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+    "code": "{{userResetCode}}",
+    "password": "{{userNewPassword}}",
+    "passwordConfirmation": "{{userNewPassword}}"
+}
+
+### 2.5 Profile
+# ดึง token อัตโนมัติจากผลลัพธ์ของ userLogin (หรือใส่ Token ใน Bearer ได้โดยตรง)
+@userToken = {{userLogin.response.body.jwt}}
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{userToken}}
