@@ -1,44 +1,61 @@
+
 services:
-  db:
+  69-s3-db:
     image: postgres:16-alpine
     container_name: 69-s3-db
-    ports:
-      - "54327:5432"
+    restart: always
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      POSTGRES_USER: narasuep_s
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: narasuep_s
+    ports:
+      - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  admin:
-    image: dpage/pgadmin4
-    container_name: 69-s3-pgadmin
-    ports:
-      - "8084:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
-    depends_on:
-      - db
-    restart: unless-stopped
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U narasuep_s -d narasuep_s"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   my_app:
-    image: prawee/strapi
+    build: .
     container_name: my_app
-    ports:
-      - "${APP_PORT}:1337"
+    restart: always
+    env_file:
+      - .env
     environment:
-      - DATABASE_CLIENT=${DATABASE_CLIENT}
-      - DATABASE_HOST=${DATABASE_HOST}
-      - DATABASE_PORT=${DATABASE_PORT}
-      - DATABASE_NAME=${DB_NAME}
-      - DATABASE_USERNAME=${DB_USER}
-      - DATABASE_PASSWORD=${DB_PASSWORD}
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: 69-s3-db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: narasuep_s
+      DATABASE_USERNAME: narasuep_s
+      DATABASE_PASSWORD: password
+      DATABASE_SSL: "false"
+      APP_KEYS: SkBcfK0hve9Mm4vGQccRjA==,PknGDrNHH3uxjnYtWauyVw==,6VsG8u5Hl4mNqOl11VE2GQ==,TTJN5C9l3aKYldYgBolsdw==
+      API_TOKEN_SALT: zspAQf3gUi8kfXLmrjm68Q==
+      ADMIN_JWT_SECRET: ocB0Pc/x82rryH9k85DEBg==
+      JWT_SECRET: RU8GJ1QtZScRpqJH0u22AQ==
+      TRANSFER_TOKEN_SALT: y5KvoV3Ed8/heWJfroWJFQ==
+      ENCRYPTION_KEY: Yv5Xdn9UOY/sEK1/9LjU3w==
+    ports:
+      - "8083:1337" # APP_PORT 8083
     depends_on:
-      - db
-    restart: unless-stopped
+      69-s3-db:
+        condition: service_healthy
+
+  69-s3-pgadmin:
+    image: dpage/pgadmin4
+    container_name: 69-s3-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: narasuep-s@rmutp.ac.th
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - "8084:80"
+    depends_on:
+      69-s3-db:
+        condition: service_healthy
 
 volumes:
-  db_data:
+  pgdata:

@@ -1,0 +1,129 @@
+###############################################################################
+#                           API TESTING ENVIRONMENT                           #
+#                 Strapi v5 - Admin & User Authentication Flow                #
+###############################################################################
+
+### Global Configuration
+@baseUrl = http://localhost:8083
+
+
+###############################################################################
+# 1. ADMIN SECTION (Strapi Admin Panel API)
+#    - Base Path: {{baseUrl}}/admin/...
+#    - Target Table in DB: `admin_users`
+###############################################################################
+
+### [Admin Variables]
+@adminEmail = narasuep-s@rmutp.ac.th
+@adminPassword = TempPass#2026!
+@adminNewPassword = TempPass#2026!
+@adminResetToken = 
+
+### 1.1 Login (Admin)
+# บันทึกผลลัพธ์อัตโนมัติเพื่อใช้ Token ใน Request อื่น
+# @name adminLogin
+POST {{baseUrl}}/admin/login
+Content-Type: application/json
+
+{
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}",
+    "rememberMe": true
+}
+
+### 1.2 Register / Signup (Admin)
+# สมัคร Admin คนแรก (สำหรับการตั้งค่าระบบเริ่มต้น)
+POST {{baseUrl}}/admin/register
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}"
+}
+
+### 1.3 Forgot Password (Admin)
+# ขอ Reset Password (ระบบจะสร้าง Token ใน table `admin_users` -> `reset_password_token`)
+POST {{baseUrl}}/admin/forgot-password
+Content-Type: application/json
+
+{
+    "email": "{{adminEmail}}"
+}
+
+### 1.4 Reset Password (Admin)
+# ใช้ Token ที่ได้มาใน key "resetPasswordToken"
+POST {{baseUrl}}/admin/reset-password
+Content-Type: application/json
+
+{
+    "resetPasswordToken": "{{adminResetToken}}",
+    "password": "{{adminNewPassword}}"
+}
+
+### 1.5 Get Admin Profile (Admin)
+# ดึง Token จากผลลัพธ์ของ adminLogin อัตโนมัติ (หรือใส่ Token แทนที่ตัวแปรได้)
+@adminToken = {{adminLogin.response.body.data.token}}
+GET {{baseUrl}}/admin/users/me
+Authorization: Bearer {{adminToken}}
+
+
+###############################################################################
+# 2. USER SECTION (Strapi End-User / Users & Permissions Plugin)
+#    - Base Path: {{baseUrl}}/api/auth/... และ {{baseUrl}}/api/users/...
+#    - Target Table in DB: `up_users`
+###############################################################################
+
+### [User Variables]
+@userEmail = narasuep-s@rmutp.ac.th
+@userPassword = TempPass#2026!
+@userNewPassword = TempPass#2026!
+@userResetCode = 
+
+### 2.1 Login (User)
+# บันทึกผลลัพธ์อัตโนมัติเพื่อใช้ JWT ใน Request อื่น
+# @name userLogin
+POST {{baseUrl}}/api/auth/local
+Content-Type: application/json
+
+{
+    "identifier": "{{userEmail}}",
+    "password": "{{userPassword}}"
+}
+
+### 2.2 Register / Signup (User)
+# สมัครสมาชิกผู้ใช้งานทั่วไป
+POST {{baseUrl}}/api/auth/local/register
+Content-Type: application/json
+
+{
+    "username": "narasuep-s",
+    "email": "{{userEmail}}",
+    "password": "{{userPassword}}"
+}
+
+### 2.3 Forgot Password (User)
+# ขอ Reset Password (ระบบจะสร้าง Code ใน table `up_users` -> `reset_password_token`)
+POST {{baseUrl}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+    "email": "{{userEmail}}"
+}
+
+### 2.4 Reset Password (User)
+# ใช้ Code ใน key "code" และต้องมี "passwordConfirmation"
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+    "code": "{{userResetCode}}",
+    "password": "{{userNewPassword}}",
+    "passwordConfirmation": "{{userNewPassword}}"
+}
+
+### 2.5 Get User Profile (User)
+# ดึง JWT จากผลลัพธ์ของ userLogin อัตโนมัติ (หรือใส่ JWT แทนที่ตัวแปรได้)
+@userToken = {{userLogin.response.body.jwt}}
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{userToken}}
